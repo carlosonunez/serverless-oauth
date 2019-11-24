@@ -1,6 +1,6 @@
 require 'logger'
 
-module TripItAPI
+module My_First_ProjectAPI
   module Logger
 
   end

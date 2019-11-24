@@ -1,20 +1,20 @@
 require 'spec_helper'
 
-describe "TripIt OAuth" do
+describe "My_First_Project OAuth" do
   before(:all) do
     @final_auth_url = String.new
   end
 
   context "Step 1" do
     it "Should give me a URL to continue authenticating", :integration do
-      uri = "#{$api_gateway_url}/auth?workspace=#{ENV['TRIPIT_WORKSPACE_NAME']}&reauthenticate=true"
+      uri = "#{$api_gateway_url}/auth?workspace=#{ENV['MY_FIRST_PROJECT_WORKSPACE_NAME']}&reauthenticate=true"
       response = HTTParty.get(uri, {
         headers: { 'x-api-key': $test_api_key }
       })
-      expected_message_re = %r{You will need to authenticate into TripIt first; \
+      expected_message_re = %r{You will need to authenticate into My_First_Project first; \
 click on or copy/paste this URL to get started: \
-https://#{ENV['TRIPIT_WORKSPACE_NAME']}.tripit.com\
-/oauth/authorize\?client_id=#{ENV['TRIPIT_APP_CLIENT_ID']}&\
+https://#{ENV['MY_FIRST_PROJECT_WORKSPACE_NAME']}.my_first_project.com\
+/oauth/authorize\?client_id=#{ENV['MY_FIRST_PROJECT_APP_CLIENT_ID']}&\
 scope=users.profile:read,users.profile:write&\
 redirect_uri=#{$api_gateway_url}/callback&state=[a-zA-Z0-9]{32}}
       expect(JSON.parse(response.body)['message']).to match expected_message_re
@@ -26,7 +26,7 @@ redirect_uri=#{$api_gateway_url}/callback&state=[a-zA-Z0-9]{32}}
   # requires user action through a GUI.
   context "Step 2" do
     it "Should save my token with my API key", :integration do
-      uri = "#{$api_gateway_url}/auth?workspace=#{ENV['TRIPIT_WORKSPACE_NAME']}&reauthenticate=true"
+      uri = "#{$api_gateway_url}/auth?workspace=#{ENV['MY_FIRST_PROJECT_WORKSPACE_NAME']}&reauthenticate=true"
       response = HTTParty.get(uri, {
         headers: { 'x-api-key': $test_api_key }
       })
@@ -34,8 +34,8 @@ redirect_uri=#{$api_gateway_url}/callback&state=[a-zA-Z0-9]{32}}
       auth_url = message.match('^.*get started: (http.*)$').captures[0]
 
       visit(auth_url)
-      fill_in "email", with: ENV['TRIPIT_SANDBOX_ACCOUNT_EMAIL']
-      fill_in "password", with: ENV['TRIPIT_SANDBOX_ACCOUNT_PASSWORD']
+      fill_in "email", with: ENV['MY_FIRST_PROJECT_SANDBOX_ACCOUNT_EMAIL']
+      fill_in "password", with: ENV['MY_FIRST_PROJECT_SANDBOX_ACCOUNT_PASSWORD']
       click_button "signin_btn"
       click_button "Allow"
 

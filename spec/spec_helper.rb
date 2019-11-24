@@ -3,7 +3,7 @@ require 'httparty'
 require 'capybara'
 require 'capybara/dsl'
 require 'selenium-webdriver'
-require 'tripit-api'
+require 'my_first_project-api'
 require 'timeout'
 Dir.glob('/app/spec/helpers/**/*.rb') do |file|
   require_relative file
@@ -62,11 +62,11 @@ run 'docker-compose run --rm integration-setup'" \
     Capybara.default_driver = :selenium
 
     if !$callback_updated
-      if ENV['DISABLE_TRIPIT_CALLBACK_UPDATING'] != 'true'
-        puts "INFO: Updating TripIt callback URIs."
-        if !Helpers::TripIt::OAuth.update_callback_uri! \
+      if ENV['DISABLE_MY_FIRST_PROJECT_CALLBACK_UPDATING'] != 'true'
+        puts "INFO: Updating My_First_Project callback URIs."
+        if !Helpers::My_First_Project::OAuth.update_callback_uri! \
           callback_uri: "#{$api_gateway_url}/callback"
-          raise "Unable to update TripIt callback URIs; stopping early to prevent later failures."
+          raise "Unable to update My_First_Project callback URIs; stopping early to prevent later failures."
         end
         $callback_updated = true
       end

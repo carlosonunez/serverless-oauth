@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'ostruct'
 
-describe "TripIt OAuth" do
+describe "My_First_Project OAuth" do
   context 'Handling state associations' do
     it "Should save access keys with state IDs", :unit do
       Helpers::Aws::DynamoDBLocal.drop_tables!
@@ -12,9 +12,9 @@ describe "TripIt OAuth" do
           }
         }
       }.to_json)
-      TripItAPI::Auth.associate_access_key_to_state_id!(event: fake_event,
+      My_First_ProjectAPI::Auth.associate_access_key_to_state_id!(event: fake_event,
                                                        state_id: 'fake-state-id')
-      expect(TripItAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
+      expect(My_First_ProjectAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
         .to eq 'fake-key'
     end
   end
@@ -33,7 +33,7 @@ describe "TripIt OAuth" do
         statusCode: 404,
         body: { status: 'error', message: 'No token exists for this access key.' }.to_json
       }
-      expect(TripItAPI::Auth::get_tripit_token(event: fake_event)).to eq expected_response
+      expect(My_First_ProjectAPI::Auth::get_my_first_project_token(event: fake_event)).to eq expected_response
     end
 
     it "Should persist tokens with their associated API keys", :unit do
@@ -48,9 +48,9 @@ describe "TripIt OAuth" do
         statusCode: 200,
         body: { status: 'ok', token: 'fake' }.to_json
       }
-      expect(TripItAPI::Auth::put_tripit_token(access_key: 'fake-key',
-                                             tripit_token: 'fake')).to be true
-      expect(TripItAPI::Auth::get_tripit_token(event: fake_event)).to eq expected_get_response
+      expect(My_First_ProjectAPI::Auth::put_my_first_project_token(access_key: 'fake-key',
+                                             my_first_project_token: 'fake')).to be true
+      expect(My_First_ProjectAPI::Auth::get_my_first_project_token(event: fake_event)).to eq expected_get_response
     end
   end
   context "We aren't authenticated yet" do
@@ -71,9 +71,9 @@ describe "TripIt OAuth" do
           Host: 'example.fake'
         }
       }.to_json)
-      expected_message = "You will need to authenticate into TripIt first; \
+      expected_message = "You will need to authenticate into My_First_Project first; \
 click on or copy/paste this URL to get started: \
-https://fake.tripit.com/oauth/authorize?client_id=fake&\
+https://fake.my_first_project.com/oauth/authorize?client_id=fake&\
 scope=users.profile:read,users.profile:write&\
 redirect_uri=https://example.fake/develop/callback&\
 state=fake-state-id"
@@ -81,10 +81,10 @@ state=fake-state-id"
         statusCode: 200,
         body: { status: 'ok', message: expected_message }.to_json
       }
-      expect(TripItAPI::Auth::begin_authentication_flow(fake_event,
+      expect(My_First_ProjectAPI::Auth::begin_authentication_flow(fake_event,
                                                        client_id: 'fake'))
         .to eq expected_response
-      expect(TripItAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
+      expect(My_First_ProjectAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
         .to eq 'fake-key'
     end
 
@@ -102,9 +102,9 @@ state=fake-state-id"
           Host: 'example.fake'
         }
       }.to_json)
-      expected_message = "You will need to authenticate into TripIt first; \
+      expected_message = "You will need to authenticate into My_First_Project first; \
 click on or copy/paste this URL to get started: \
-https://tripit.com/oauth/authorize?client_id=fake&\
+https://my_first_project.com/oauth/authorize?client_id=fake&\
 scope=users.profile:read,users.profile:write&\
 redirect_uri=https://example.fake/develop/callback&\
 state=fake-state-id"
@@ -112,16 +112,16 @@ state=fake-state-id"
         statusCode: 200,
         body: { status: 'ok', message: expected_message }.to_json
       }
-      expect(TripItAPI::Auth::begin_authentication_flow(fake_event,
+      expect(My_First_ProjectAPI::Auth::begin_authentication_flow(fake_event,
                                                        client_id: 'fake'))
         .to eq expected_response
-      expect(TripItAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
+      expect(My_First_ProjectAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
         .to eq 'fake-key'
     end
 
     it "Should short-circuit this process if the user already has a token", :unit do
       Helpers::Aws::DynamoDBLocal.drop_tables!
-      TripItAPI::Auth.put_tripit_token(access_key: 'fake-key', tripit_token: 'fake')
+      My_First_ProjectAPI::Auth.put_my_first_project_token(access_key: 'fake-key', my_first_project_token: 'fake')
       fake_event = JSON.parse({
         requestContext: {
           path: '/develop/auth',
@@ -137,14 +137,14 @@ state=fake-state-id"
         statusCode: 200,
         body: { status: 'ok', message: 'You already have a token.' }.to_json
       }
-      expect(TripItAPI::Auth.begin_authentication_flow(fake_event,
+      expect(My_First_ProjectAPI::Auth.begin_authentication_flow(fake_event,
                                                       client_id: 'fake'))
           .to eq expected_response
     end
     it "Should avoid short-circuiting if we tell it to", :unit do
         Helpers::Aws::DynamoDBLocal.drop_tables!
         expect(SecureRandom).to receive(:hex).and_return('fake-state-id')
-        TripItAPI::Auth.put_tripit_token(access_key: 'fake-key-again', tripit_token: 'fake')
+        My_First_ProjectAPI::Auth.put_my_first_project_token(access_key: 'fake-key-again', my_first_project_token: 'fake')
         fake_event = JSON.parse({
           requestContext: {
             path: '/develop/auth',
@@ -159,9 +159,9 @@ state=fake-state-id"
             Host: 'example.fake'
           }
         }.to_json)
-        expected_message = "You will need to authenticate into TripIt first; \
+        expected_message = "You will need to authenticate into My_First_Project first; \
 click on or copy/paste this URL to get started: \
-https://tripit.com/oauth/authorize?client_id=fake&\
+https://my_first_project.com/oauth/authorize?client_id=fake&\
 scope=users.profile:read,users.profile:write&\
 redirect_uri=https://example.fake/develop/callback&\
 state=fake-state-id"
@@ -169,10 +169,10 @@ state=fake-state-id"
           statusCode: 200,
           body: { status: 'ok', message: expected_message }.to_json
         }
-        expect(TripItAPI::Auth::begin_authentication_flow(fake_event,
+        expect(My_First_ProjectAPI::Auth::begin_authentication_flow(fake_event,
                                                          client_id: 'fake'))
           .to eq expected_response
-        expect(TripItAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
+        expect(My_First_ProjectAPI::Auth.get_access_key_from_state(state_id: 'fake-state-id'))
           .to eq 'fake-key-again'
     end
   end
@@ -198,14 +198,14 @@ state=fake-state-id"
           Host: 'example.host'
         }
       }.to_json)
-      allow(TripItAPI::TripIt::OAuth).to receive(:access).and_return(OpenStruct.new(
+      allow(My_First_ProjectAPI::My_First_Project::OAuth).to receive(:access).and_return(OpenStruct.new(
         body: {
           ok: true,
           access_token: 'fake-token',
           scope: 'read'
         }.to_json))
-      allow(TripItAPI::Auth).to receive(:get_access_key_from_state).and_return('fake-key')
-      expect(TripItAPI::Auth::handle_callback(fake_event)).to eq expected_response
+      allow(My_First_ProjectAPI::Auth).to receive(:get_access_key_from_state).and_return('fake-key')
+      expect(My_First_ProjectAPI::Auth::handle_callback(fake_event)).to eq expected_response
     end
   end
 end

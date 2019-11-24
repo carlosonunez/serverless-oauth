@@ -9,4 +9,4 @@ COPY Gemfile /
 RUN bundle install --gemfile /Gemfile
 
 WORKDIR /app
-ENTRYPOINT ["ruby", "-e", "puts 'Welcome to tripit-api'"]
+ENTRYPOINT ["ruby", "-e", "puts 'Welcome to my_first_project-api'"]
